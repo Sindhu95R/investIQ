@@ -1,30 +1,30 @@
-from  flask import Flask
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///intellIQ.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATION']=False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///intellIQ.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-ma =Marshmallow(app)
+ma = Marshmallow(app)
 
 migrate = Migrate(app, db)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100))
-    email=db.Column(db.Column())
-    
+    email = db.Column(db.String(100)) 
+
     def __init__(self, username, email):
         self.username = username
         self.email = email
-        
-class UserSchema(ma.Schema):       
+
+class UserSchema(ma.Schema):
     class Meta:
-        fields =('id','username','email')
+        fields = ('id', 'username', 'email')
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
