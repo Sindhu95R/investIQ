@@ -1,1 +1,1 @@
-# intelIQ
+# investIQ
