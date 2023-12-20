@@ -1,0 +1,150 @@
+{% extends 'header.html' %}
+{% block title %}Cryptocurrency Prices{% endblock %}
+
+{% block content %}
+<body>
+    <div class="container">
+        <h1>Cryptocurrency Prices</h1>
+        <p>Top Coins by Market Cap</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Last Price (USD)</th>
+                    <th>1h</th>
+                    <th>24h</th>
+                    <th>7d</th>
+                    <th>24h Volume (USD)</th>
+                    <th>Market Cap (USD)</th>
+                    <th>Last 7 Days</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for crypto in cryptocurrencies %}
+
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ crypto.name }}</td>
+            
+                        <td id="price{{ forloop.counter }}"></td>
+
+                        <td class="{% if crypto.percent_change_1h is not None %}{% if crypto.percent_change_1h > 0 %}positive{% elif crypto.percent_change_1h < 0 %}negative{% endif %}{% endif %}">
+                            {% if crypto.percent_change_1h is not None %}
+                                {% if crypto.percent_change_1h > 0 %}+{% endif %}
+                                {{ crypto.percent_change_1h|stringformat:".2f" }}%
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                
+                        <td class="{% if crypto.percent_change_24h is not None %}{% if crypto.percent_change_24h > 0 %}positive{% elif crypto.percent_change_24h < 0 %}negative{% endif %}{% endif %}">
+                            {% if crypto.percent_change_24h is not None %}
+                                {% if crypto.percent_change_24h > 0 %}+{% endif %}
+                                {{ crypto.percent_change_24h|stringformat:".2f" }}%
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        
+                        <td class="{% if crypto.percent_change_7d is not None %}{% if crypto.percent_change_7d > 0 %}positive{% elif crypto.percent_change_7d < 0 %}negative{% endif %}{% endif %}">
+                            {% if crypto.percent_change_7d is not None %}
+                                {% if crypto.percent_change_7d > 0 %}+{% endif %}
+                                {{ crypto.percent_change_7d|stringformat:".2f" }}%
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+        
+             
+                        <td id="volume{{ forloop.counter }}"></td>
+            
+                        <td id="marketCap{{ forloop.counter }}"></td>
+
+                        <!-- plot the graph for the col 'last 7 days'-->
+
+                        <td>
+                            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                            <!-- Canvas for the graph -->
+                            <canvas id="cryptoGraph{{ forloop.counter }}""></canvas>
+                        </td>
+
+                       
+                        <!-- set commas -->
+                        <script>
+                            // Format Price
+                            var priceElement = document.getElementById('price{{ forloop.counter }}');
+                            var priceValue = {{ crypto.price_usd|floatformat:2 }};
+                            priceElement.innerText = '$' + priceValue.toLocaleString();
+                        
+                            // Format 24h Volume
+                            var volumeElement = document.getElementById('volume{{ forloop.counter }}');
+                            var volumeValue = {{ crypto.volume_usd_24h|floatformat:2 }};
+                            volumeElement.innerText = '$' + volumeValue.toLocaleString();
+                        
+                            // Format Market Cap
+                            var marketCapElement = document.getElementById('marketCap{{ forloop.counter }}');
+                            var marketCapValue = {{ crypto.market_cap_usd|floatformat:2 }};
+                            marketCapElement.innerText = '$' + marketCapValue.toLocaleString();
+
+                            var ctx{{ forloop.counter }} = document.getElementById('cryptoGraph{{ forloop.counter }}').getContext('2d');
+                            new Chart(ctx{{ forloop.counter }}, {
+                                type: 'line',
+                                data: {
+                                    labels: {{ crypto.last_7_days_data.dates|safe }},
+                                    datasets: [{
+                                        label: '{{ crypto.name }}',
+                                        data: {{ crypto.last_7_days_data.values|safe }},
+                                        fill: false,
+                                        borderColor: 'rgb(75, 192, 192)',
+                                        tension: 0.1
+                                    }]
+                                },
+                                options: {
+                                    scales: {
+                                        x: {
+                                            display: false,
+                                            title: {
+                                                display: false,
+                                                text: 'Date'
+                                            }
+                                        },
+                                        y: {
+                                            display: false,
+                                            title: {
+                                                display: false,
+                                                text: 'Price'
+                                            }
+                                        }
+                                    }
+                                },
+                                maintainAspectRatio: false,
+                                responsive: true, 
+
+                                plugins: {
+                                    legend: {
+                                        display: false,
+                                        position: 'top' 
+                                    }
+                                }
+                            });
+
+
+                        </script>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+            
+
+        </table>
+    </div>
+
+</body>
+</html>
+{% endblock %}
+
+<!-- from intelIQ.models import Cryptocurrency, Transaction, HistoricalPrice 
+    from django.contrib.auth.models import User
+Cryptocurrency.objects.all().delete()
+User.objects.all().delete() -->
