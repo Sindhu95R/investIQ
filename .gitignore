@@ -1,0 +1,22 @@
+__pycache__
+
+# Python Virtual Environment
+venv/
+
+# IntelliJ
+
+.idea/
+
+# Environmental Variables
+
+.env
+
+.netrc
+
+# Packaging
+
+*.egg-info
+
+build/
+
+dist/
