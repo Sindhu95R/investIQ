@@ -1,1 +1,1 @@
-# investIQ
+# Data Hunters
